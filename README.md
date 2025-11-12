@@ -68,6 +68,6 @@ coffee_shop/
 * **public/** — everything visible to the user (CSS, JS, images, index.php).  
 * **.htaccess** — makes URLs look clean and friendly (e.g., `/product/1` instead of `?controller=product&id=1`).  
 
----
-```
+
+
 
