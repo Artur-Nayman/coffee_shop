@@ -19,7 +19,7 @@ async function login() {
     }
 
     alert("Login successful!");
-    window.location.href = "/menu.html";
+    window.location.href = "/index.html";
   } catch (err) {
     console.error("Fetch error:", err);
     alert("Network error, try again.");
