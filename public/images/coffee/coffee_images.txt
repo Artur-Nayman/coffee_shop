@@ -1,0 +1,2 @@
+# Store all coffee product images and related graphics here
+# Example: espresso.jpg, latte.jpg, cappuccino.jpg
