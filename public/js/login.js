@@ -18,6 +18,7 @@ async function login() {
       return;
     }
 
+    localStorage.setItem('token', data.token);
     alert("Login successful!");
     window.location.href = "/index.html";
   } catch (err) {

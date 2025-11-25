@@ -7,13 +7,14 @@
 <body class="auth-page">
 <div id="navbar-container"></div>
 <div class="form-box">
-  <h2>Login</h2>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p>No account? <a href="signup.html">Sign Up</a></p>
+  <form id="login-form">
+    <h2>Login</h2>
+    <input id="email" type="email" placeholder="Email" name="email" required>
+    <input id="password" type="password" placeholder="Password" name="password" required>
+    <button type="submit">Login</button>
+    <p>No account? <a href="signup.html">Sign Up</a></p>
+  </form>
 </div>
-<script src="js/login.js"></script>
-<script src="js/loadNavbar.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

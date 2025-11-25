@@ -2,9 +2,17 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db'); // database connection
 
+// Middleware to check for admin role
+const isAdmin = (req, res, next) => {
+    if (req.userData && req.userData.role === 'admin') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Forbidden: Admins only' });
+    }
+};
 
 // POST route to save a new product
-router.post('/add-product', async (req, res) => {
+router.post('/add-product', isAdmin, async (req, res) => {
   const { name, description, price, image } = req.body;
 
   try {
@@ -20,10 +28,10 @@ router.post('/add-product', async (req, res) => {
       image || null  // if image is empty, store NULL
     ]);
 
-    res.send('Product saved successfully!');
+    res.status(200).json({ message: 'Product saved successfully!' });
   } catch (err) {
     console.error('Error inserting product:', err);
-    res.status(500).send('Error saving product');
+    res.status(500).json({ error: 'Error saving product' });
   }
 });
 
