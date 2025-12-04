@@ -50,7 +50,6 @@ exports.updateStatus = async (req, res) => {
 // GET MY ORDERS (USER)
 exports.getMyOrders = async (req, res) => {
     try {
-        console.log("req.userData =", req.userData); // DEBUG
 
         const userId = req.userData.userId;
         const orders = await Order.getUserOrders(userId);
@@ -87,7 +86,6 @@ exports.cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
 
-        // FIXED: use correct field
         const userId = req.userData.userId;
 
         const order = await Order.getOrderById(orderId);
