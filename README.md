@@ -69,7 +69,6 @@ coffee_shop/
 
    ```bash
    npm install
-   npm install ejs
    ```
 
 3. Create a `.env` file with your MySQL configuration:
