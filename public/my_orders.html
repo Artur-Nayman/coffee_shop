@@ -12,7 +12,7 @@
 <div id="navbar-container"></div>
 
 <div class="container">
-  
+
   <div class="section page-header">
       <h1 class="page-header__title">My Orders</h1>
       <p class="page-header__subtitle">View your order history</p>
@@ -24,17 +24,23 @@
 
 <script>
 function loadMyOrders() {
+
+    const token = localStorage.getItem("token");
+
     fetch("/orders/mine", {
+        method: "GET",
         headers: {
-            "Authorization": "Bearer " + localStorage.getItem("token")
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
         }
     })
     .then(res => res.json())
     .then(orders => {
+
         const container = document.getElementById("orders-container");
         container.innerHTML = "";
 
-        if (!orders || orders.length === 0) {
+        if (!Array.isArray(orders) || orders.length === 0) {
             container.innerHTML = `<p>No orders found.</p>`;
             return;
         }
@@ -42,7 +48,7 @@ function loadMyOrders() {
         orders.forEach(order => {
 
             let itemsHTML = "";
-            order.items.forEach(item => {
+            order.items?.forEach(item => {
                 itemsHTML += `
                     <li>
                         Product ID: ${item.product_id}<br>
@@ -53,38 +59,42 @@ function loadMyOrders() {
             });
 
             container.innerHTML += `
-            <div class="product-card">
-              <div class="product-card__body">
-                
-                <h2 class="product-card__title">Order #${order.id}</h2>
+                <div class="product-card">
+                    <div class="product-card__body">
 
-                <p class="product-card__description">
-                    <strong>Date:</strong> ${order.created_at || "N/A"}<br>
-                    <strong>Total:</strong> $${order.total_price}<br>
-                    <strong>Status:</strong> ${order.status}
-                </p>
+                        <h2 class="product-card__title">Order #${order.id}</h2>
 
-                <div class="product-card__meta" style="margin-top: 15px;">
-                    <strong>Items:</strong>
-                    <ul>${itemsHTML}</ul>
+                        <p class="product-card__description">
+                            <strong>Date:</strong> ${order.created_at || "N/A"}<br>
+                            <strong>Total:</strong> $${order.total_price}<br>
+                            <strong>Status:</strong> ${order.status}
+                        </p>
+
+                        <div class="product-card__meta">
+                            <strong>Items:</strong>
+                            <ul
+                                ${itemsHTML}
+                            </ul>
+                        </div>
+
+                        ${order.status === "pending" ? `
+                            <button class="btn btn--outline" style="margin-top: 15px;"
+                                onclick="cancelOrder(${order.id})">
+                                Cancel Order
+                            </button>
+                        ` : ""}
+                    </div>
                 </div>
-
-                ${order.status === "pending" ? `
-                    <button class="btn btn--outline" style="margin-top: 15px;" onclick="cancelOrder(${order.id})">
-                        Cancel Order
-                    </button>
-                ` : ``}
-
-              </div>
-            </div>`;
+            `;
         });
     });
 }
 
 function cancelOrder(orderId) {
+
     if (!confirm("Are you sure you want to cancel this order?")) return;
 
-    fetch(`/orders/cancel/${orderId}`, {
+    fetch("/orders/cancel/" + orderId, {
         method: "PUT",
         headers: { 
             "Content-Type": "application/json",

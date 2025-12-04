@@ -50,8 +50,9 @@ exports.updateStatus = async (req, res) => {
 // GET MY ORDERS (USER)
 exports.getMyOrders = async (req, res) => {
     try {
-        const userId = req.user.id;
+        console.log("req.userData =", req.userData); // DEBUG
 
+        const userId = req.userData.userId;
         const orders = await Order.getUserOrders(userId);
 
         for (const order of orders) {
@@ -82,27 +83,32 @@ exports.getAllOrders = async (req, res) => {
     }
 };
 
-// CANCEL ORDER
 exports.cancelOrder = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const { orderId } = req.params;
+        const orderId = req.params.orderId;
 
-        const orders = await Order.getUserOrders(userId);
-        const order = orders.find(o => o.id == orderId);
+        // FIXED: use correct field
+        const userId = req.userData.userId;
 
+        const order = await Order.getOrderById(orderId);
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
         }
 
-        if (order.status !== "pending") {
+        if (order.user_id !== userId) {
+            return res.status(403).json({ message: "You cannot cancel someone else's order" });
+        }
+
+        if (order.status !== 'pending') {
             return res.status(400).json({ message: "Only pending orders can be cancelled" });
         }
 
-        await Order.updateStatus(orderId, "cancelled");
+        await Order.updateStatus(orderId, 'cancelled');
+
         res.json({ message: "Order cancelled successfully" });
 
-    } catch (err) {
-        res.status(500).json({ error: "Cancel failed" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error while cancelling order" });
     }
 };
