@@ -7,46 +7,52 @@ const authRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const db = require('./config/db');
 const authMiddleware = require('./middleware/authMiddleware');
-const adminMiddleware = require('./middleware/adminMiddleware'); // Додано
+const adminMiddleware = require('./middleware/adminMiddleware');
 
 const menuRoutes = require('./routes/menuRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 
-// Налаштування CORS для дозволу передачі credentials (cookies)
 app.use(cors({
-    origin: true, // Або вкажіть ваш фронтенд домен, наприклад 'http://localhost:3000'
+    origin: true,
     credentials: true
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Налаштування сесій
 app.use(session({
     secret: 'your_super_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Для HTTP. Для HTTPS встановіть 'true'
-        httpOnly: true, // Допомагає захиститися від XSS
-        sameSite: 'lax' // Рекомендовано для безпеки
+        secure: false,
+        httpOnly: true,
+        sameSite: 'lax'
     }
 }));
+
+// НОВИЙ MIDDLEWARE: Робить кількість товарів у кошику доступною для всіх шаблонів
+app.use((req, res, next) => {
+    if (req.session.cart) {
+        res.locals.cartItemCount = req.session.cart.reduce((sum, item) => sum + item.quantity, 0);
+    } else {
+        res.locals.cartItemCount = 0;
+    }
+    next();
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Підключення маршрутів
 app.use('/', menuRoutes);
 app.use('/', cartRoutes);
 
 app.use('/api/auth', authRoutes);
-// Захищаємо адмін-маршрути за допомогою adminMiddleware
-app.use('/admin', adminMiddleware, adminRoutes); // Змінено
+app.use('/admin', adminMiddleware, adminRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'login.html'));

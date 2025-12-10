@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// ... (existing code for /api/cart/add)
+// ... (existing code for cart management)
 
 router.post('/api/cart/add', async (req, res) => {
     const { productId, quantity } = req.body;
@@ -52,8 +52,6 @@ router.post('/api/cart/add', async (req, res) => {
     }
 });
 
-// ... (existing code for /api/cart)
-
 router.get('/api/cart', (req, res) => {
     if (!req.session.cart) {
         return res.json([]);
@@ -61,8 +59,43 @@ router.get('/api/cart', (req, res) => {
     res.json(req.session.cart);
 });
 
-// ... (existing code for /api/orders/create)
+router.put('/api/cart/item/:productId', (req, res) => {
+    const { productId } = req.params;
+    const { quantity } = req.body;
 
+    if (!req.session.cart) {
+        return res.status(400).json({ message: 'Cart not found' });
+    }
+
+    const itemIndex = req.session.cart.findIndex(item => item.id == productId);
+
+    if (itemIndex > -1) {
+        req.session.cart[itemIndex].quantity = parseInt(quantity, 10);
+        req.session.save(err => {
+            if (err) return res.status(500).json({ message: 'Failed to update cart' });
+            res.status(200).json(req.session.cart);
+        });
+    } else {
+        res.status(404).json({ message: 'Item not found in cart' });
+    }
+});
+
+router.delete('/api/cart/item/:productId', (req, res) => {
+    const { productId } = req.params;
+
+    if (!req.session.cart) {
+        return res.status(400).json({ message: 'Cart not found' });
+    }
+
+    req.session.cart = req.session.cart.filter(item => item.id != productId);
+
+    req.session.save(err => {
+        if (err) return res.status(500).json({ message: 'Failed to update cart' });
+        res.status(200).json(req.session.cart);
+    });
+});
+
+// Create a new order
 router.post('/api/orders/create', authMiddleware, async (req, res) => {
     const userId = req.userData.userId;
     const cart = req.session.cart;
@@ -76,7 +109,10 @@ router.post('/api/orders/create', authMiddleware, async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        const total_price = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        // ВИПРАВЛЕНО: Додаємо вартість доставки на back-end
+        const shippingCost = 0.80;
+        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const total_price = subtotal + shippingCost;
 
         const [orderResult] = await connection.execute(
             'INSERT INTO orders (user_id, total_price) VALUES (?, ?)',
@@ -112,7 +148,7 @@ router.post('/api/orders/create', authMiddleware, async (req, res) => {
     }
 });
 
-// ... (existing code for /api/my-orders)
+// ... (existing routes for my-orders and cancel)
 
 router.get('/api/my-orders', authMiddleware, async (req, res) => {
     const userId = req.userData.userId;
@@ -143,7 +179,6 @@ router.get('/api/my-orders', authMiddleware, async (req, res) => {
     }
 });
 
-//  Cancel an order
 router.put('/api/orders/cancel/:orderId', authMiddleware, async (req, res) => {
     const userId = req.userData.userId;
     const orderId = req.params.orderId;

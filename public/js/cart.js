@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             subtotalEl.textContent = '$0.00';
             totalEl.textContent = `$${shippingCost.toFixed(2)}`;
             checkoutBtn.disabled = true;
+            if (window.updateCartCounter) window.updateCartCounter(); // Оновити лічильник до 0
             return;
         }
 
@@ -62,6 +63,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         checkoutBtn.disabled = false;
     }
 
+    // Функція для оновлення кількості товару
+    async function updateQuantity(productId, quantity) {
+        try {
+            const response = await fetch(`/api/cart/item/${productId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity: parseInt(quantity, 10) })
+            });
+            if (!response.ok) throw new Error('Failed to update item.');
+            const updatedCart = await response.json();
+            renderCart(updatedCart);
+            if (window.updateCartCounter) window.updateCartCounter(); // Оновлюємо лічильник у навігації
+        } catch (error) {
+            console.error('Update cart error:', error);
+        }
+    }
+
+    // Функція для видалення товару з кошика
+    async function removeItem(productId) {
+        try {
+            const response = await fetch(`/api/cart/item/${productId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Failed to remove item.');
+            const updatedCart = await response.json();
+            renderCart(updatedCart);
+            if (window.updateCartCounter) window.updateCartCounter(); // Оновлюємо лічильник у навігації
+        } catch (error) {
+            console.error('Remove cart error:', error);
+        }
+    }
+
+    // Додаємо єдиний обробник подій для всього кошика (event delegation)
+    cartGrid.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-item-btn')) {
+            const productCard = event.target.closest('.product-card');
+            const productId = productCard.dataset.productId;
+            removeItem(productId);
+        }
+    });
+
+    cartGrid.addEventListener('change', (event) => {
+        if (event.target.classList.contains('item-quantity')) {
+            const productCard = event.target.closest('.product-card');
+            const productId = productCard.dataset.productId;
+            const newQuantity = event.target.value;
+            updateQuantity(productId, newQuantity);
+        }
+    });
+
     checkoutBtn.addEventListener('click', async () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -81,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (response.ok) {
                 const result = await response.json();
-                alert(`Order created successfully! Order ID: ${result.orderId}`);
+                // alert(`Order created successfully! Order ID: ${result.orderId}`); // Прибираємо alert для кращого UX
                 // Redirect to a "my orders" page or home page
                 window.location.href = '/my_orders.html';
             } else {
