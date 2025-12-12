@@ -64,5 +64,54 @@ router.delete('/products/:id', async (req, res) => {
 });
 
 
+// GET one product by ID (for edit form)
+router.get('/products/:id', async (req, res) => {
+  const productId = req.params.id;
+
+  try {
+    const sql = 'SELECT id, name, description, price, image FROM products WHERE id = ?';
+    const [rows] = await db.execute(sql, [productId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(rows[0]); // return single product object
+  } catch (err) {
+    console.error('Error fetching product:', err);
+    res.status(500).json({ error: 'Error loading product' });
+  }
+});
+
+// UPDATE product by ID
+router.put('/products/:id', async (req, res) => {
+  const productId = req.params.id;
+  const { name, description, price, image } = req.body;
+
+  try {
+    const sql = `
+      UPDATE products
+      SET name = ?, description = ?, price = ?, image = ?
+      WHERE id = ?
+    `;
+
+    await db.execute(sql, [
+      name,
+      description,
+      price,
+      image || null,
+      productId
+    ]);
+
+    res.json({ message: 'Product updated successfully' });
+  } catch (err) {
+    console.error('Update error:', err);
+    res.status(500).json({ error: 'Error updating product' });
+  }
+});
+
+
+
+
 
 module.exports = router;

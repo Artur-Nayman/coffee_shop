@@ -37,6 +37,14 @@ tr.innerHTML = `
   }
 });
 
+// Edit click listener
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('edit-btn')) {
+    const id = e.target.dataset.id;
+    window.location.href = `/admin_editproduct.html?id=${id}`;
+  }
+});
+
 function deleteProduct(id) {
   if (!confirm("Are you sure you want to delete this product?")) {
     return; // User canceled
