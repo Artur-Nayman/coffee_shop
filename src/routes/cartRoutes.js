@@ -109,8 +109,8 @@ router.post('/api/orders/create', authMiddleware, async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        // ВИПРАВЛЕНО: Додаємо вартість доставки на back-end
-        const shippingCost = 0.80;
+
+        const shippingCost = 10;
         const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const total_price = subtotal + shippingCost;
 

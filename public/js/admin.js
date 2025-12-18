@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateOrderStatus(orderId, newStatus) {
         try {
-            // ВИПРАВЛЕНО: Правильний URL для оновлення статусу
             const response = await fetch(`/admin/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {

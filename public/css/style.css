@@ -28,7 +28,7 @@ body {
 body.auth-page,
 body.auth-page * {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-  background: #f5f5f5;
+
   color: #333;
 }
 
@@ -145,6 +145,70 @@ body.auth-page {
 .content, .form-box {
   margin-top: 80px;
 }
+
+/* =======================
+   RESPONSIVE NAVBAR
+   ======================= */
+
+.navbar-container {
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* links */
+.navbar-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* burger hidden on desktop */
+.burger {
+  display: none;
+  font-size: 26px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+  .burger {
+    display: block;
+  }
+
+  .navbar-links {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: #6f4e37;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .navbar-links a {
+    width: 100%;
+    text-align: center;
+    padding: 15px 0;
+    border-radius: 0;
+  }
+
+  .navbar-links.active {
+    max-height: 300px;
+  }
+}
+
 
 /* ============================================================================================
    GLOBAL WEBSITE UI (from second file)
@@ -423,4 +487,76 @@ body.auth-page {
   padding: 1.5rem 1rem 2rem;
   font-size: 0.85rem;
   color: #777;
+}
+
+.product-grid--menu {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.product-grid--menu .product-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-grid--menu .product-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-grid--menu .product-card__footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .product-grid--menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .product-grid--menu {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.cart-grid .product-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-grid .product-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.cart-grid .product-card__footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .cart-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cart-grid {
+    grid-template-columns: 1fr;
+  }
 }

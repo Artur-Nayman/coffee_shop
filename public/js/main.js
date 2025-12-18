@@ -22,63 +22,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- UPDATE NAVBAR ---
-    function updateNavbar() {
-        const navbar = document.querySelector('nav.navbar');
-        if (!navbar) return;
+function updateNavbar() {
+  const navbar = document.querySelector('nav.navbar');
+  if (!navbar) return;
 
-        const token = localStorage.getItem('token');
-        const loginLink = navbar.querySelector('a[href="login.html"]');
-        const cartLink = navbar.querySelector('a[href="cart.html"]');
+  const linksContainer = navbar.querySelector('.navbar-links');
+  if (!linksContainer) return;
 
-        // Remove any dynamically added links first to avoid duplicates
-        navbar.querySelectorAll('.dynamic-link').forEach(link => link.remove());
+  const token = localStorage.getItem('token');
+  const loginLink = linksContainer.querySelector('a[href="/login.html"]');
 
-        if (token) {
-            // --- USER IS LOGGED IN ---
-            if (loginLink) loginLink.style.display = 'none'; // Hide original login link
+  linksContainer.querySelectorAll('.dynamic-link').forEach(el => el.remove());
 
-            // Add "Log Out" button
-            const logoutBtn = document.createElement('a');
-            logoutBtn.href = '#';
-            logoutBtn.textContent = 'Logout';
-            logoutBtn.classList.add('dynamic-link'); // Mark as dynamic
-            logoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                logout();
-            });
-            navbar.insertBefore(logoutBtn, null); // Insert as last item
+  if (token) {
+    // --- USER LOGGED IN ---
+    if (loginLink) loginLink.style.display = 'none';
 
-            // Add "Admin Panel" link if admin
-            const decoded = decodeToken(token);
-            if (decoded && decoded.role === 'admin') {
-                const adminLink = document.createElement('a');
-                adminLink.href = 'admin.html';
-                adminLink.textContent = 'Admin Panel';
-                adminLink.classList.add('dynamic-link'); // Mark as dynamic
-                navbar.insertBefore(adminLink, logoutBtn); // Insert before logout button
-            }
-        } else {
-            // --- USER IS LOGGED OUT ---
-            if (loginLink) loginLink.style.display = ''; // Show original login link
-        }
+    // Logout
+    const logoutBtn = document.createElement('a');
+    logoutBtn.href = '#';
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.classList.add('dynamic-link');
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      logout();
+    });
+
+    linksContainer.appendChild(logoutBtn);
+
+    // Admin Panel (if admin)
+    const decoded = decodeToken(token);
+    if (decoded?.role === 'admin') {
+      const adminLink = document.createElement('a');
+      adminLink.href = '/admin.html';
+      adminLink.textContent = 'Admin Panel';
+      adminLink.classList.add('dynamic-link');
+
+      linksContainer.insertBefore(adminLink, logoutBtn);
     }
+
+  } else {
+    // --- USER LOGGED OUT ---
+    if (loginLink) loginLink.style.display = '';
+  }
+}
 
     // --- INITIALIZE NAVBAR ---
-    function initializeNavbar() {
-        const navbarContainer = document.getElementById('navbar-container');
-        if (navbarContainer) {
-            fetch('navbar.html')
-                .then(response => {
-                    if (!response.ok) throw new Error('Navbar not found');
-                    return response.text();
-                })
-                .then(data => {
-                    navbarContainer.innerHTML = data;
-                    updateNavbar(); // Update navbar AFTER it has been loaded
-                })
-                .catch(error => console.error("Error loading navbar:", error));
-        }
-    }
+function initializeNavbar() {
+  const navbarContainer = document.getElementById('navbar-container');
+  if (!navbarContainer) return;
+
+  fetch('/navbar.html')
+    .then(res => res.text())
+    .then(html => {
+      navbarContainer.innerHTML = html;
+
+      const burger = navbarContainer.querySelector('#burger');
+      const links = navbarContainer.querySelector('#nav-links');
+
+      if (burger && links) {
+        burger.addEventListener('click', () => {
+          links.classList.toggle('active');
+        });
+      }
+
+      updateNavbar();
+    })
+    .catch(err => console.error('Navbar load error:', err));
+}
 
     // --- LOGIN FORM ---
     const loginForm = document.querySelector('#login-form');

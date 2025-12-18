@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const subtotalEl = document.getElementById('subtotal');
     const totalEl = document.getElementById('total');
     const checkoutBtn = document.getElementById('proceed-to-checkout-btn');
-    const shippingCost = 10.00;
+    const shippingCost = 0.00;
 
     if (!cartGrid || !subtotalEl || !totalEl || !checkoutBtn) {
         console.error('Required elements not found on the page.');

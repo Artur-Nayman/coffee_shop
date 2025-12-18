@@ -33,7 +33,6 @@ app.use(session({
     }
 }));
 
-// НОВИЙ MIDDLEWARE: Робить кількість товарів у кошику доступною для всіх шаблонів
 app.use((req, res, next) => {
     if (req.session.cart) {
         res.locals.cartItemCount = req.session.cart.reduce((sum, item) => sum + item.quantity, 0);

@@ -17,11 +17,7 @@
 
   <!-- ======= CATEGORY FILTERS (JUST VISUAL, NO JS NEEDED) ======= -->
   <section class="section">
-    <div class="filters">
-      <button class="filter-button filter-button--active">All</button>
-      <button class="filter-button">Hot Drinks</button>
-      <button class="filter-button">Cold Drinks</button>
-      <button class="filter-button">Pastries</button>
+
     </div>
 
     <!-- ======= PRODUCTS GRID ======= -->
@@ -42,7 +38,6 @@
                 <%= product.description %>
               </p>
               <div class="product-card__meta">
-                <!-- می‌تونید بعداً tag/size رو اینجا نشون بدید -->
               </div>
               <div class="product-card__footer">
                 <span class="product-card__price">
@@ -85,7 +80,6 @@
               const result = await response.json();
               console.log('Product added to cart:', result);
               alert('Product added to cart!');
-              // Тут можна оновити іконку кошика
             } else {
               const error = await response.json();
               alert('Failed to add product: ' + error.message);
